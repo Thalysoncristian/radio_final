@@ -272,24 +272,26 @@ function upper(str) {
 
 async function fetchCurrentSong() {
   try {
-    // Primeira tentativa com HTTPS
-    let res = await fetch('https://31.97.249.57/api/nowplaying', {
+    console.log('🎵 Buscando dados da música...');
+    
+    // Usa o mesmo protocolo que foi detectado na inicialização
+    const baseUrl = radioUrl.value.replace('/listen/thalyson/radio.mp3', '');
+    const apiUrl = `${baseUrl}/api/nowplaying`;
+    
+    console.log(`🔗 Fazendo requisição para: ${apiUrl}`);
+    
+    const res = await fetch(apiUrl, {
       headers: {
         'Authorization': 'Bearer bd0af7ebc28a76ee:080c11920e7551b3665d74bc4789394e'
       }
     });
     
-    // Se falhar, tenta com HTTP (fallback para dispositivos móveis)
     if (!res.ok) {
-      console.log('HTTPS falhou, tentando HTTP...');
-      res = await fetch('http://31.97.249.57/api/nowplaying', {
-        headers: {
-          'Authorization': 'Bearer bd0af7ebc28a76ee:080c11920e7551b3665d74bc4789394e'
-        }
-      });
+      throw new Error(`HTTP ${res.status}: ${res.statusText}`);
     }
     
     const data = await res.json();
+    console.log('✅ Dados recebidos:', data);
 
     // Se houver mais de uma estação, pegue a primeira (ou ajuste para sua estação)
     const station = Array.isArray(data) ? data[0] : data;
@@ -312,26 +314,20 @@ async function fetchCurrentSong() {
     if (song.art && song.art.trim() !== '') {
       if (song.art.startsWith('http')) {
         capa.value = song.art;
+        console.log('🖼️ Usando URL completa da capa:', song.art);
       } else {
-        // Tenta HTTPS primeiro, se falhar usa HTTP
-        const httpsUrl = `https://31.97.249.57${song.art}`;
-        const httpUrl = `http://31.97.249.57${song.art}`;
-        
-        // Testa se a imagem HTTPS carrega
-        try {
-          const imgTest = new Image();
-          imgTest.onload = () => { capa.value = httpsUrl; };
-          imgTest.onerror = () => { capa.value = httpUrl; };
-          imgTest.src = httpsUrl;
-        } catch (e) {
-          capa.value = httpUrl;
-        }
+        // Usa o mesmo protocolo detectado
+        const capaUrl = `${baseUrl}${song.art}`;
+        capa.value = capaUrl;
+        console.log('🖼️ Usando URL relativa da capa:', capaUrl);
       }
     } else {
       capa.value = '/capa.jpg';
+      console.log('🖼️ Usando capa padrão');
     }
     
     ouvintes.value = listeners;
+    console.log(`👥 Ouvintes: ${ouvintes.value}`);
 
     // Adicione ao histórico, se desejar
     const hora = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
@@ -343,9 +339,10 @@ async function fetchCurrentSong() {
     ) {
       historico.value.unshift(novaEntrada);
       if (historico.value.length > 100) historico.value.pop();
+      console.log('📝 Nova música adicionada ao histórico');
     }
   } catch (e) {
-    console.error('Erro ao buscar dados do Azurecast', e);
+    console.error('❌ Erro ao buscar dados do Azurecast:', e);
     // Em caso de erro, mantém os dados padrão
   }
 }
@@ -418,33 +415,103 @@ function toggleMinimalPlayer() {
 
 // Função para detectar o melhor protocolo para o dispositivo
 async function detectBestProtocol() {
-  try {
-    // Testa HTTPS primeiro
-    const httpsTest = await fetch('https://31.97.249.57/api/nowplaying', {
-      method: 'HEAD',
-      headers: {
-        'Authorization': 'Bearer bd0af7ebc28a76ee:080c11920e7551b3665d74bc4789394e'
-      }
-    });
+  console.log('🔍 Detectando melhor protocolo...');
+  
+  // Para dispositivos móveis, vamos tentar HTTP primeiro (mais compatível)
+  const isMobile = window.innerWidth < 768;
+  
+  if (isMobile) {
+    console.log('📱 Dispositivo móvel detectado, testando HTTP primeiro...');
     
-    if (httpsTest.ok) {
-      console.log('HTTPS funcionando, usando HTTPS');
-      return 'https';
+    try {
+      const httpTest = await fetch('http://31.97.249.57/api/nowplaying', {
+        method: 'HEAD',
+        headers: {
+          'Authorization': 'Bearer bd0af7ebc28a76ee:080c11920e7551b3665d74bc4789394e'
+        }
+      });
+      
+      if (httpTest.ok) {
+        console.log('✅ HTTP funcionando no mobile');
+        return 'http';
+      }
+    } catch (e) {
+      console.log('❌ HTTP falhou no mobile:', e.message);
     }
-  } catch (e) {
-    console.log('HTTPS falhou, usando HTTP');
+    
+    // Se HTTP falhar, tenta HTTPS
+    try {
+      const httpsTest = await fetch('https://31.97.249.57/api/nowplaying', {
+        method: 'HEAD',
+        headers: {
+          'Authorization': 'Bearer bd0af7ebc28a76ee:080c11920e7551b3665d74bc4789394e'
+        }
+      });
+      
+      if (httpsTest.ok) {
+        console.log('✅ HTTPS funcionando no mobile');
+        return 'https';
+      }
+    } catch (e) {
+      console.log('❌ HTTPS falhou no mobile:', e.message);
+    }
+  } else {
+    // Para desktop, tenta HTTPS primeiro
+    console.log('🖥️ Desktop detectado, testando HTTPS primeiro...');
+    
+    try {
+      const httpsTest = await fetch('https://31.97.249.57/api/nowplaying', {
+        method: 'HEAD',
+        headers: {
+          'Authorization': 'Bearer bd0af7ebc28a76ee:080c11920e7551b3665d74bc4789394e'
+        }
+      });
+      
+      if (httpsTest.ok) {
+        console.log('✅ HTTPS funcionando no desktop');
+        return 'https';
+      }
+    } catch (e) {
+      console.log('❌ HTTPS falhou no desktop:', e.message);
+    }
+    
+    // Se HTTPS falhar, tenta HTTP
+    try {
+      const httpTest = await fetch('http://31.97.249.57/api/nowplaying', {
+        method: 'HEAD',
+        headers: {
+          'Authorization': 'Bearer bd0af7ebc28a76ee:080c11920e7551b3665d74bc4789394e'
+        }
+      });
+      
+      if (httpTest.ok) {
+        console.log('✅ HTTP funcionando no desktop');
+        return 'http';
+      }
+    } catch (e) {
+      console.log('❌ HTTP falhou no desktop:', e.message);
+    }
   }
   
+  // Se ambos falharem, usa HTTP como padrão
+  console.log('⚠️ Ambos os protocolos falharam, usando HTTP como padrão');
   return 'http';
 }
 
 // Função para atualizar URLs baseada no protocolo detectado
 async function updateUrls() {
+  console.log('🔄 Atualizando URLs...');
   const protocol = await detectBestProtocol();
   const baseUrl = `${protocol}://31.97.249.57`;
   
+  console.log(`🌐 Usando protocolo: ${protocol}`);
+  console.log(`🔗 Base URL: ${baseUrl}`);
+  
   radioUrl.value = `${baseUrl}/listen/thalyson/radio.mp3`;
   capa.value = `${baseUrl}/api/station/thalyson/art/82f9d9bfe4f386237bc16f21-1751521257.jpg`;
+  
+  console.log(`🎵 Radio URL: ${radioUrl.value}`);
+  console.log(`🖼️ Capa URL: ${capa.value}`);
 }
 </script>
 
