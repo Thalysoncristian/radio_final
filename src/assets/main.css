@@ -1,5 +1,9 @@
 @import './base.css';
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 body {
   font-family: 'Unbounded', 'Inter', Arial, sans-serif;
   background: var(--color-background);
