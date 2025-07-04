@@ -184,14 +184,14 @@ const playing = ref(false)
 const artista = ref('PRÓTON-4')
 const musica = ref('NA ÓRBITA DA TERRA')
 const cidade = ref('BELÉM / PA')
-const capa = ref('https://31.97.249.57/api/station/thalyson/art/82f9d9bfe4f386237bc16f21-1751521257.jpg')
+const capa = ref('https://srv895506.hstgr.cloud/api/station/thalyson/art/82f9d9bfe4f386237bc16f21-1751521257.jpg')
 
 const historico = ref([])
 
 const bgImages = ['bg.jpg', 'b2.jpeg']
 const bgIndex = ref(0)
 const isDesktop = ref(window.innerWidth >= 768)
-const radioUrl = ref('https://31.97.249.57/listen/thalyson/radio.mp3')
+const radioUrl = ref('https://srv895506.hstgr.cloud/listen/thalyson/radio.mp3')
 const audioRef = ref(null)
 const volume = ref(0.8)
 const ouvintes = ref(0)
@@ -417,92 +417,16 @@ function toggleMinimalPlayer() {
 async function detectBestProtocol() {
   console.log('🔍 Detectando melhor protocolo...');
   
-  // Para dispositivos móveis, vamos tentar HTTP primeiro (mais compatível)
-  const isMobile = window.innerWidth < 768;
-  
-  if (isMobile) {
-    console.log('📱 Dispositivo móvel detectado, testando HTTP primeiro...');
-    
-    try {
-      const httpTest = await fetch('http://31.97.249.57/api/nowplaying', {
-        method: 'HEAD',
-        headers: {
-          'Authorization': 'Bearer bd0af7ebc28a76ee:080c11920e7551b3665d74bc4789394e'
-        }
-      });
-      
-      if (httpTest.ok) {
-        console.log('✅ HTTP funcionando no mobile');
-        return 'http';
-      }
-    } catch (e) {
-      console.log('❌ HTTP falhou no mobile:', e.message);
-    }
-    
-    // Se HTTP falhar, tenta HTTPS
-    try {
-      const httpsTest = await fetch('https://31.97.249.57/api/nowplaying', {
-        method: 'HEAD',
-        headers: {
-          'Authorization': 'Bearer bd0af7ebc28a76ee:080c11920e7551b3665d74bc4789394e'
-        }
-      });
-      
-      if (httpsTest.ok) {
-        console.log('✅ HTTPS funcionando no mobile');
-        return 'https';
-      }
-    } catch (e) {
-      console.log('❌ HTTPS falhou no mobile:', e.message);
-    }
-  } else {
-    // Para desktop, tenta HTTPS primeiro
-    console.log('🖥️ Desktop detectado, testando HTTPS primeiro...');
-    
-    try {
-      const httpsTest = await fetch('https://31.97.249.57/api/nowplaying', {
-        method: 'HEAD',
-        headers: {
-          'Authorization': 'Bearer bd0af7ebc28a76ee:080c11920e7551b3665d74bc4789394e'
-        }
-      });
-      
-      if (httpsTest.ok) {
-        console.log('✅ HTTPS funcionando no desktop');
-        return 'https';
-      }
-    } catch (e) {
-      console.log('❌ HTTPS falhou no desktop:', e.message);
-    }
-    
-    // Se HTTPS falhar, tenta HTTP
-    try {
-      const httpTest = await fetch('http://31.97.249.57/api/nowplaying', {
-        method: 'HEAD',
-        headers: {
-          'Authorization': 'Bearer bd0af7ebc28a76ee:080c11920e7551b3665d74bc4789394e'
-        }
-      });
-      
-      if (httpTest.ok) {
-        console.log('✅ HTTP funcionando no desktop');
-        return 'http';
-      }
-    } catch (e) {
-      console.log('❌ HTTP falhou no desktop:', e.message);
-    }
-  }
-  
-  // Se ambos falharem, usa HTTP como padrão
-  console.log('⚠️ Ambos os protocolos falharam, usando HTTP como padrão');
-  return 'http';
+  // Com domínio, sempre usar HTTPS (mais seguro e compatível)
+  console.log('✅ Usando HTTPS com domínio');
+  return 'https';
 }
 
 // Função para atualizar URLs baseada no protocolo detectado
 async function updateUrls() {
   console.log('🔄 Atualizando URLs...');
   const protocol = await detectBestProtocol();
-  const baseUrl = `${protocol}://31.97.249.57`;
+  const baseUrl = `${protocol}://srv895506.hstgr.cloud`;
   
   console.log(`🌐 Usando protocolo: ${protocol}`);
   console.log(`🔗 Base URL: ${baseUrl}`);
