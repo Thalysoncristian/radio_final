@@ -184,14 +184,14 @@ const playing = ref(false)
 const artista = ref('PRÓTON-4')
 const musica = ref('NA ÓRBITA DA TERRA')
 const cidade = ref('BELÉM / PA')
-const capa = ref('http://31.97.249.57/api/station/thalyson/art/82f9d9bfe4f386237bc16f21-1751521257.jpg')
+const capa = ref('//31.97.249.57/api/station/thalyson/art/82f9d9bfe4f386237bc16f21-1751521257.jpg')
 
 const historico = ref([])
 
 const bgImages = ['bg.jpg', 'b2.jpeg']
 const bgIndex = ref(0)
 const isDesktop = ref(window.innerWidth >= 768)
-const radioUrl = ref('http://31.97.249.57/listen/thalyson/radio.mp3')
+const radioUrl = ref('//31.97.249.57/listen/thalyson/radio.mp3')
 const audioRef = ref(null)
 const volume = ref(0.8)
 const ouvintes = ref(0)
@@ -268,7 +268,7 @@ function upper(str) {
 
 async function fetchCurrentSong() {
   try {
-    const res = await fetch('http://31.97.249.57/api/nowplaying', {
+    const res = await fetch('//31.97.249.57/api/nowplaying', {
       headers: {
         'Authorization': 'Bearer bd0af7ebc28a76ee:080c11920e7551b3665d74bc4789394e'
       }
@@ -292,7 +292,7 @@ async function fetchCurrentSong() {
     const musicaFormatada = (song.title || '').replace(/\s*[\r\n]+\s*/g, ' ').toUpperCase();
     musica.value = musicaFormatada;
     capa.value = song.art && song.art.trim() !== ''
-      ? (song.art.startsWith('http') ? song.art : `http://31.97.249.57${song.art}`)
+      ? (song.art.startsWith('http') ? song.art : `//31.97.249.57${song.art}`)
       : '/capa.jpg';
     ouvintes.value = listeners;
 
