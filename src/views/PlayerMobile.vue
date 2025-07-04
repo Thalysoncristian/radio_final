@@ -191,7 +191,7 @@ const historico = ref([])
 const bgImages = ['bg.jpg', 'b2.jpeg']
 const bgIndex = ref(0)
 const isDesktop = ref(window.innerWidth >= 768)
-const radioUrl = ref('/.netlify/functions/proxy?url=/listen/thalyson/radio.mp3')
+const radioUrl = ref('https://srv895506.hstgr.cloud/listen/thalyson/radio.mp3')
 const audioRef = ref(null)
 const volume = ref(0.8)
 const ouvintes = ref(0)
@@ -413,8 +413,8 @@ async function detectBestProtocol() {
 
 // Função para atualizar URLs baseada no proxy
 async function updateUrls() {
-  console.log('🔄 Atualizando URLs para proxy...');
-  radioUrl.value = '/.netlify/functions/proxy?url=/listen/thalyson/radio.mp3';
+  console.log('🔄 Atualizando URLs para proxy/metadados...');
+  radioUrl.value = 'https://srv895506.hstgr.cloud/listen/thalyson/radio.mp3';
   capa.value = '/.netlify/functions/proxy?url=/api/station/thalyson/art/82f9d9bfe4f386237bc16f21-1751521257.jpg';
   console.log(`🎵 Radio URL: ${radioUrl.value}`);
   console.log(`🖼️ Capa URL: ${capa.value}`);
