@@ -184,14 +184,14 @@ const playing = ref(false)
 const artista = ref('PRÓTON-4')
 const musica = ref('NA ÓRBITA DA TERRA')
 const cidade = ref('BELÉM / PA')
-const capa = ref('/.netlify/functions/proxy?url=/api/station/thalyson/art/82f9d9bfe4f386237bc16f21-1751521257.jpg')
+const capa = ref('https://mlinsights.fun/api/station/thalyson/art/82f9d9bfe4f386237bc16f21-1751521257.jpg')
 
 const historico = ref([])
 
 const bgImages = ['bg.jpg', 'b2.jpeg']
 const bgIndex = ref(0)
 const isDesktop = ref(window.innerWidth >= 768)
-const radioUrl = ref('https://srv895506.hstgr.cloud/listen/thalyson/radio.mp3')
+const radioUrl = ref('https://mlinsights.fun/listen/thalyson/radio.mp3')
 const audioRef = ref(null)
 const volume = ref(0.8)
 const ouvintes = ref(0)
@@ -272,10 +272,14 @@ function upper(str) {
 
 async function fetchCurrentSong() {
   try {
-    console.log('🎵 Buscando dados da música via proxy...');
-    const apiUrl = '/.netlify/functions/proxy?url=/api/nowplaying';
+    console.log('🎵 Buscando dados da música...');
+    const apiUrl = 'https://mlinsights.fun/api/nowplaying';
     console.log(`🔗 Fazendo requisição para: ${apiUrl}`);
-    const res = await fetch(apiUrl);
+    const res = await fetch(apiUrl, {
+      headers: {
+        'Authorization': 'Bearer bd0af7ebc28a76ee:080c11920e7551b3665d74bc4789394e'
+      }
+    });
     if (!res.ok) {
       throw new Error(`HTTP ${res.status}: ${res.statusText}`);
     }
@@ -302,13 +306,11 @@ async function fetchCurrentSong() {
     // Tratamento inteligente da URL da capa
     if (song.art && song.art.trim() !== '') {
       if (song.art.startsWith('http')) {
-        // Remove domínio e usa proxy
-        const artPath = song.art.replace(/^https?:\/\/[^/]+/, '');
-        capa.value = `/.netlify/functions/proxy?url=${artPath}`;
-        console.log('🖼️ Usando capa via proxy:', capa.value);
+        capa.value = song.art;
+        console.log('🖼️ Usando capa:', capa.value);
       } else {
-        capa.value = `/.netlify/functions/proxy?url=${song.art}`;
-        console.log('🖼️ Usando capa relativa via proxy:', capa.value);
+        capa.value = `https://mlinsights.fun${song.art}`;
+        console.log('🖼️ Usando capa relativa:', capa.value);
       }
     } else {
       capa.value = '/capa.jpg';
@@ -331,7 +333,7 @@ async function fetchCurrentSong() {
       console.log('📝 Nova música adicionada ao histórico');
     }
   } catch (e) {
-    console.error('❌ Erro ao buscar dados do Azurecast via proxy:', e);
+    console.error('❌ Erro ao buscar dados do Azurecast:', e);
     // Em caso de erro, mantém os dados padrão
   }
 }
@@ -402,20 +404,11 @@ function toggleMinimalPlayer() {
   minimalPlayer.value = !minimalPlayer.value
 }
 
-// Função para detectar o melhor protocolo para o dispositivo
-async function detectBestProtocol() {
-  console.log('🔍 Detectando melhor protocolo...');
-  
-  // Com domínio, sempre usar HTTPS (mais seguro e compatível)
-  console.log('✅ Usando HTTPS com domínio');
-  return 'https';
-}
-
-// Função para atualizar URLs baseada no proxy
+// Função para atualizar URLs baseada no domínio novo
 async function updateUrls() {
-  console.log('🔄 Atualizando URLs para proxy/metadados...');
-  radioUrl.value = 'https://srv895506.hstgr.cloud/listen/thalyson/radio.mp3';
-  capa.value = '/.netlify/functions/proxy?url=/api/station/thalyson/art/82f9d9bfe4f386237bc16f21-1751521257.jpg';
+  console.log('🔄 Atualizando URLs para novo domínio...');
+  radioUrl.value = 'https://mlinsights.fun/listen/thalyson/radio.mp3';
+  capa.value = 'https://mlinsights.fun/api/station/thalyson/art/82f9d9bfe4f386237bc16f21-1751521257.jpg';
   console.log(`🎵 Radio URL: ${radioUrl.value}`);
   console.log(`🖼️ Capa URL: ${capa.value}`);
 }
