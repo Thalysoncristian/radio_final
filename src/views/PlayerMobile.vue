@@ -243,8 +243,12 @@ watch(volume, (val) => {
     audioRef.value.volume = val
   }
 })
-onMounted(() => {
+onMounted(async () => {
   window.addEventListener('resize', handleResize)
+  
+  // Detecta o melhor protocolo e atualiza URLs
+  await updateUrls();
+  
   if (audioRef.value) {
     audioRef.value.volume = volume.value
   }
@@ -268,11 +272,23 @@ function upper(str) {
 
 async function fetchCurrentSong() {
   try {
-    const res = await fetch('https://31.97.249.57/api/nowplaying', {
+    // Primeira tentativa com HTTPS
+    let res = await fetch('https://31.97.249.57/api/nowplaying', {
       headers: {
         'Authorization': 'Bearer bd0af7ebc28a76ee:080c11920e7551b3665d74bc4789394e'
       }
     });
+    
+    // Se falhar, tenta com HTTP (fallback para dispositivos móveis)
+    if (!res.ok) {
+      console.log('HTTPS falhou, tentando HTTP...');
+      res = await fetch('http://31.97.249.57/api/nowplaying', {
+        headers: {
+          'Authorization': 'Bearer bd0af7ebc28a76ee:080c11920e7551b3665d74bc4789394e'
+        }
+      });
+    }
+    
     const data = await res.json();
 
     // Se houver mais de uma estação, pegue a primeira (ou ajuste para sua estação)
@@ -291,9 +307,30 @@ async function fetchCurrentSong() {
     artista.value = (song.artist || '').toUpperCase();
     const musicaFormatada = (song.title || '').replace(/\s*[\r\n]+\s*/g, ' ').toUpperCase();
     musica.value = musicaFormatada;
-    capa.value = song.art && song.art.trim() !== ''
-      ? (song.art.startsWith('http') ? song.art : `https://31.97.249.57${song.art}`)
-      : '/capa.jpg';
+    
+    // Tratamento inteligente da URL da capa
+    if (song.art && song.art.trim() !== '') {
+      if (song.art.startsWith('http')) {
+        capa.value = song.art;
+      } else {
+        // Tenta HTTPS primeiro, se falhar usa HTTP
+        const httpsUrl = `https://31.97.249.57${song.art}`;
+        const httpUrl = `http://31.97.249.57${song.art}`;
+        
+        // Testa se a imagem HTTPS carrega
+        try {
+          const imgTest = new Image();
+          imgTest.onload = () => { capa.value = httpsUrl; };
+          imgTest.onerror = () => { capa.value = httpUrl; };
+          imgTest.src = httpsUrl;
+        } catch (e) {
+          capa.value = httpUrl;
+        }
+      }
+    } else {
+      capa.value = '/capa.jpg';
+    }
+    
     ouvintes.value = listeners;
 
     // Adicione ao histórico, se desejar
@@ -309,6 +346,7 @@ async function fetchCurrentSong() {
     }
   } catch (e) {
     console.error('Erro ao buscar dados do Azurecast', e);
+    // Em caso de erro, mantém os dados padrão
   }
 }
 
@@ -376,6 +414,37 @@ const styleLegenda = computed(() => ({
 
 function toggleMinimalPlayer() {
   minimalPlayer.value = !minimalPlayer.value
+}
+
+// Função para detectar o melhor protocolo para o dispositivo
+async function detectBestProtocol() {
+  try {
+    // Testa HTTPS primeiro
+    const httpsTest = await fetch('https://31.97.249.57/api/nowplaying', {
+      method: 'HEAD',
+      headers: {
+        'Authorization': 'Bearer bd0af7ebc28a76ee:080c11920e7551b3665d74bc4789394e'
+      }
+    });
+    
+    if (httpsTest.ok) {
+      console.log('HTTPS funcionando, usando HTTPS');
+      return 'https';
+    }
+  } catch (e) {
+    console.log('HTTPS falhou, usando HTTP');
+  }
+  
+  return 'http';
+}
+
+// Função para atualizar URLs baseada no protocolo detectado
+async function updateUrls() {
+  const protocol = await detectBestProtocol();
+  const baseUrl = `${protocol}://31.97.249.57`;
+  
+  radioUrl.value = `${baseUrl}/listen/thalyson/radio.mp3`;
+  capa.value = `${baseUrl}/api/station/thalyson/art/82f9d9bfe4f386237bc16f21-1751521257.jpg`;
 }
 </script>
 
