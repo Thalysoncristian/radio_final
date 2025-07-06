@@ -17,5 +17,13 @@ export default defineConfig({
   },
   server: {
     host: '0.0.0.0', // 🔧 Permite acesso de outros dispositivos na rede
-  }
+  },
+  build: {
+    minify: 'esbuild',
+    cssCodeSplit: true,
+    sourcemap: false,
+  },
+  esbuild: {
+    drop: ['console'],
+  },
 })

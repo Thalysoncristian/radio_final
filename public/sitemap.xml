@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://radiofinal.netlify.app/</loc>
+  </url>
+  <url>
+    <loc>https://radiofinal.netlify.app/programacao</loc>
+  </url>
+  <url>
+    <loc>https://radiofinal.netlify.app/login</loc>
+  </url>
+  <url>
+    <loc>https://radiofinal.netlify.app/admin</loc>
+  </url>
+  <url>
+    <loc>https://radiofinal.netlify.app/admin/programas</loc>
+  </url>
+  <url>
+    <loc>https://radiofinal.netlify.app/admin/agendamentos</loc>
+  </url>
+  <url>
+    <loc>https://radiofinal.netlify.app/admin/playlists</loc>
+  </url>
+  <url>
+    <loc>https://radiofinal.netlify.app/config</loc>
+  </url>
+</urlset> 

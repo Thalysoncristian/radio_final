@@ -54,7 +54,7 @@
       </transition>
       <div class="desktop-player" :class="{ minimal: minimalPlayer }">
         <div v-if="capa" class="album-cover" style="display:flex;justify-content:center;align-items:center;margin-bottom:16px;">
-          <img :src="capa" alt="Capa do álbum" :style="styleCapa" />
+          <img :src="capa" alt="Capa do álbum" :style="styleCapa" loading="lazy" />
         </div>
         <transition name="fade-slide">
           <div class="desktop-title impact-title" :style="styleTitulo" key="artista">{{ artista }}</div>
@@ -75,7 +75,7 @@
           <span :class="['footer-menu', {active: activePanel==='music'}]" @click="togglePanel('music')">ÉTER</span>
         </div>
         <div class="footer-center" style="display: flex; align-items: center; justify-content: center; gap: 16px; position: relative; width: 100%;">
-          <img src="/logo@capa-removebg-preview.png" alt="Logo" class="footer-logo" />
+          <img src="/logo@capa-removebg-preview.png" alt="Logo" class="footer-logo" loading="lazy" />
           <div class="footer-title">Gothic &amp; Wave</div>
         </div>
         <div class="footer-right" v-if="!minimalPlayer">
@@ -85,7 +85,8 @@
           </span>
           <span class="footer-icon-group" style="margin-left:18px;">
             <svg width="22" height="22" fill="none" viewBox="0 0 24 24"><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7" stroke="#fff" stroke-width="2"/><rect x="9" y="9" width="6" height="6" rx="3" fill="#fff"/></svg>
-            <input type="range" min="0" max="1" step="0.01" :value="volume" @input="onVolumeChange" class="footer-slider" />
+            <label for="volume-range" class="sr-only">Volume</label>
+            <input id="volume-range" type="range" min="0" max="1" step="0.01" :value="volume" @input="onVolumeChange" class="footer-slider" />
           </span>
           <span class="footer-icon-group" style="margin-left:18px;">
             <svg width="22" height="22" fill="none" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" fill="#fff" stroke="#181716" stroke-width="2"/><circle cx="12" cy="12" r="3.5" fill="#181716"/></svg>
@@ -101,7 +102,7 @@
       <div v-if="activePanel === ''" class="main-clean main-player-center">
         <div class="player-info player-info-center">
           <div v-if="capa" class="album-cover album-cover-center">
-            <img :src="capa" alt="Capa do álbum" :style="styleCapa" />
+            <img :src="capa" alt="Capa do álbum" :style="styleCapa" loading="lazy" />
           </div>
           <div class="player-title" :style="styleTitulo">{{ artista }}</div>
           <div class="player-sub" :style="styleLegenda">{{ musica }}</div>
