@@ -184,14 +184,14 @@ const playing = ref(false)
 const artista = ref('PRÓTON-4')
 const musica = ref('NA ÓRBITA DA TERRA')
 const cidade = ref('BELÉM / PA')
-const capa = ref('https://srv895506.hstgr.cloud/api/station/thalyson/art/82f9d9bfe4f386237bc16f21-1751521257.jpg')
+const capa = ref('https://mlinsights.fun/api/station/thalyson/art/82f9d9bfe4f386237bc16f21-1751521257.jpg')
 
 const historico = ref([])
 
 const bgImages = ['bg.jpg', 'b2.jpeg']
 const bgIndex = ref(0)
 const isDesktop = ref(window.innerWidth >= 768)
-const radioUrl = ref('https://srv895506.hstgr.cloud/listen/thalyson/radio.mp3')
+const radioUrl = ref('https://mlinsights.fun/listen/thalyson/radio.mp3')
 const audioRef = ref(null)
 const volume = ref(0.8)
 const ouvintes = ref(0)
@@ -273,7 +273,7 @@ function upper(str) {
 async function fetchCurrentSong() {
   try {
     console.log('🎵 Buscando dados da música...');
-    const apiUrl = 'https://srv895506.hstgr.cloud/api/nowplaying';
+    const apiUrl = 'https://mlinsights.fun/api/nowplaying';
     console.log(`🔗 Fazendo requisição para: ${apiUrl}`);
     const res = await fetch(apiUrl, {
       headers: {
@@ -309,7 +309,7 @@ async function fetchCurrentSong() {
         capa.value = song.art;
         console.log('🖼️ Usando capa:', capa.value);
       } else {
-        capa.value = `https://srv895506.hstgr.cloud${song.art}`;
+        capa.value = `https://mlinsights.fun${song.art}`;
         console.log('🖼️ Usando capa relativa:', capa.value);
       }
     } else {
@@ -407,8 +407,8 @@ function toggleMinimalPlayer() {
 // Função para atualizar URLs baseada no domínio anterior
 async function updateUrls() {
   console.log('🔄 Atualizando URLs para domínio anterior...');
-  radioUrl.value = 'https://srv895506.hstgr.cloud/listen/thalyson/radio.mp3';
-  capa.value = 'https://srv895506.hstgr.cloud/api/station/thalyson/art/82f9d9bfe4f386237bc16f21-1751521257.jpg';
+  radioUrl.value = 'https://mlinsights.fun/listen/thalyson/radio.mp3';
+  capa.value = 'https://mlinsights.fun/api/station/thalyson/art/82f9d9bfe4f386237bc16f21-1751521257.jpg';
   console.log(`🎵 Radio URL: ${radioUrl.value}`);
   console.log(`🖼️ Capa URL: ${capa.value}`);
 }
