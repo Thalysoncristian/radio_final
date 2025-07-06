@@ -277,9 +277,7 @@ function upper(str) {
 
 async function fetchCurrentSong() {
   try {
-    console.log('🎵 Buscando dados da música...');
     const apiUrl = 'https://mlinsights.fun/api/nowplaying';
-    console.log(`🔗 Fazendo requisição para: ${apiUrl}`);
     const res = await fetch(apiUrl, {
       headers: {
         'Authorization': 'Bearer bd0af7ebc28a76ee:080c11920e7551b3665d74bc4789394e'
@@ -289,7 +287,6 @@ async function fetchCurrentSong() {
       throw new Error(`HTTP ${res.status}: ${res.statusText}`);
     }
     const data = await res.json();
-    console.log('✅ Dados recebidos:', data);
 
     // Se houver mais de uma estação, pegue a primeira (ou ajuste para sua estação)
     const station = Array.isArray(data) ? data[0] : data;
@@ -312,18 +309,14 @@ async function fetchCurrentSong() {
     if (song.art && song.art.trim() !== '') {
       if (song.art.startsWith('http')) {
         capa.value = song.art;
-        console.log('🖼️ Usando capa:', capa.value);
       } else {
         capa.value = `https://mlinsights.fun${song.art}`;
-        console.log('🖼️ Usando capa relativa:', capa.value);
       }
     } else {
       capa.value = '/capa.jpg';
-      console.log('🖼️ Usando capa padrão');
     }
     
     ouvintes.value = listeners;
-    console.log(`👥 Ouvintes: ${ouvintes.value}`);
 
     // Adicione ao histórico, se desejar
     const hora = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
@@ -335,7 +328,6 @@ async function fetchCurrentSong() {
     ) {
       historico.value.unshift(novaEntrada);
       if (historico.value.length > 50) historico.value.pop();
-      console.log('📝 Nova música adicionada ao histórico');
     }
 
     // Preencher histórico ao abrir a página
@@ -361,7 +353,6 @@ async function fetchCurrentSong() {
       });
     }
   } catch (e) {
-    console.error('❌ Erro ao buscar dados do Azurecast:', e);
     // Em caso de erro, mantém os dados padrão
   }
 }
@@ -434,11 +425,8 @@ function toggleMinimalPlayer() {
 
 // Função para atualizar URLs baseada no domínio anterior
 async function updateUrls() {
-  console.log('🔄 Atualizando URLs para domínio anterior...');
   radioUrl.value = 'https://mlinsights.fun/listen/thalyson/radio.mp3';
   capa.value = 'https://mlinsights.fun/api/station/thalyson/art/82f9d9bfe4f386237bc16f21-1751521257.jpg';
-  console.log(`🎵 Radio URL: ${radioUrl.value}`);
-  console.log(`🖼️ Capa URL: ${capa.value}`);
 }
 </script>
 
