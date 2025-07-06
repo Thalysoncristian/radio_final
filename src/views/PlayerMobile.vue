@@ -115,27 +115,31 @@
       </div>
       <!-- Painel: Bandeira -->
       <div v-if="activePanel === 'flag'" class="panel-flag-mobile">
-        <div class="panel-flag-gradient"></div>
-        <div class="panel-flag-header">
-          <div class="footer-title">Gothic &amp; Wave</div>
-          <div class="panel-flag-title">#SOVIETWAVE</div>
-          <div class="panel-flag-sub">MÚSICA RUSSA MODERNA INSPIRADA EM SONHOS DO PASSADO</div>
+        <div class="sidebar-header">
+          <div class="sidebar-title">#MinimalWave</div>
+          <div class="sidebar-desc">Radio Gothic &amp; Wave tocando o melhor da música dark</div>
         </div>
-        <div class="panel-flag-list">
-          <div class="panel-flag-section-title">NOSSAS REDES SOCIAIS</div>
-          <div class="panel-flag-list-item"><span class="sidebar-icon">📢</span> <a href="#">CANAL</a></div>
-          <div class="panel-flag-list-item"><span class="sidebar-icon">💬</span> <a href="#">GRUPO</a></div>
-          <div class="panel-flag-list-item"><span class="sidebar-icon">🖇️</span> <a href="#">COMUNIDADE</a></div>
-          <div class="panel-flag-list-item"><span class="sidebar-icon">▶️</span> <a href="#">YOUTUBE</a></div>
-          <div class="panel-flag-section-title" style="margin-top:18px;">APOIO</div>
-          <div class="panel-flag-list-item"><span class="sidebar-icon">💰</span> <a href="#">DOAÇÃO</a></div>
-          <div class="panel-flag-list-item"><span class="sidebar-icon">⚡</span> <a href="#">ASSINATURA</a></div>
-          <div class="panel-flag-section-title" style="margin-top:18px;">APLICATIVO</div>
-          <div class="panel-flag-list-item"><span class="sidebar-icon">▶️</span> <a href="#">GOOGLE PLAY</a></div>
-          <div class="panel-flag-list-item"><span class="sidebar-icon">🤖</span> <a href="#">APK ANDROID</a></div>
-          <div class="panel-flag-list-item"><span class="sidebar-icon">🪟</span> <a href="#">ZIP DO WINDOWS</a></div>
-          <div class="panel-flag-list-item"><span class="sidebar-icon">⬇️</span> <a href="#">ARQUIVO DO M3U PLAYER</a></div>
-          <div class="panel-flag-section-title" style="margin-top:18px;">FOTOS CORTESIA DA <a href="#">LOST SLIDES</a></div>
+        <div class="sidebar-section">
+          <div class="sidebar-section-title">NOSSAS REDES SOCIAIS</div>
+          <div class="sidebar-link"><span class="sidebar-icon">📢</span> <a href="#">CANAL</a></div>
+          <div class="sidebar-link"><span class="sidebar-icon">💬</span> <a href="#">GRUPO</a></div>
+          <div class="sidebar-link"><span class="sidebar-icon">🖇️</span> <a href="#">COMUNIDADE</a></div>
+          <div class="sidebar-link"><span class="sidebar-icon">▶️</span> <a href="#">YOUTUBE</a></div>
+        </div>
+        <div class="sidebar-section">
+          <div class="sidebar-section-title">APOIO</div>
+          <div class="sidebar-link"><span class="sidebar-icon">💰</span> <a href="#">DOAÇÃO</a></div>
+          <div class="sidebar-link"><span class="sidebar-icon">⚡</span> <a href="#">ASSINATURA</a></div>
+        </div>
+        <div class="sidebar-section">
+          <div class="sidebar-section-title">APLICATIVO</div>
+          <div class="sidebar-link"><span class="sidebar-icon">▶️</span> <a href="#">GOOGLE PLAY</a></div>
+          <div class="sidebar-link"><span class="sidebar-icon">🤖</span> <a href="#">APK ANDROID</a></div>
+          <div class="sidebar-link"><span class="sidebar-icon">🪟</span> <a href="#">ZIP DO WINDOWS</a></div>
+          <div class="sidebar-link"><span class="sidebar-icon">⬇️</span> <a href="#">ARQUIVO DO M3U PLAYER</a></div>
+        </div>
+        <div class="sidebar-section sidebar-footer">
+          <div class="sidebar-desc2">FOTOS CORTESIA DA<br>COMUNIDADE <a href="#">LOST SLIDES</a></div>
         </div>
       </div>
       <!-- Painel: Histórico -->
@@ -189,7 +193,7 @@ const capa = ref('https://mlinsights.fun/api/station/thalyson/art/82f9d9bfe4f386
 
 const historico = ref([])
 
-const bgImages = ['bg.jpg', 'b2.jpeg']
+const bgImages = ['/bg_optimized.jpg']
 const bgIndex = ref(0)
 const isDesktop = ref(window.innerWidth >= 768)
 const radioUrl = ref('https://mlinsights.fun/listen/thalyson/radio.mp3')
@@ -330,8 +334,31 @@ async function fetchCurrentSong() {
       historico.value[0].musica !== novaEntrada.musica
     ) {
       historico.value.unshift(novaEntrada);
-      if (historico.value.length > 100) historico.value.pop();
+      if (historico.value.length > 50) historico.value.pop();
       console.log('📝 Nova música adicionada ao histórico');
+    }
+
+    // Preencher histórico ao abrir a página
+    if (station.song_history && Array.isArray(station.song_history)) {
+      historico.value = station.song_history.slice(0, 50).map(item => {
+        const artist = item.song?.artist || '';
+        const title = item.song?.title || '';
+        return {
+          hora: new Date(item.played_at * 1000).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+          artista: artist.toUpperCase(),
+          musica: title.replace(/\s*[\r\n]+\s*/g, ' ').toUpperCase()
+        };
+      });
+    } else if (station.history && Array.isArray(station.history)) {
+      historico.value = station.history.slice(0, 50).map(item => {
+        const artist = item.song?.artist || '';
+        const title = item.song?.title || '';
+        return {
+          hora: new Date(item.played_at * 1000).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+          artista: artist.toUpperCase(),
+          musica: title.replace(/\s*[\r\n]+\s*/g, ' ').toUpperCase()
+        };
+      });
     }
   } catch (e) {
     console.error('❌ Erro ao buscar dados do Azurecast:', e);
@@ -420,7 +447,7 @@ async function updateUrls() {
   position: relative;
   width: 100%;
   min-height: 100dvh;
-  background-image: url('/bg.webp');
+  background-image: url('/bg_optimized.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -494,8 +521,6 @@ async function updateUrls() {
     height: 100vh !important;
     position: fixed !important;
     width: 100vw !important;
-    overscroll-behavior: none !important;
-    touch-action: none !important;
   }
   .main-bg, .mobile-layout, .panel-flag-mobile, .panel-history-mobile, .panel-box {
     overflow: hidden !important;
@@ -558,6 +583,34 @@ async function updateUrls() {
   }
   .main-bg {
     background-image: url('/bg-mobile.webp');
+  }
+  .panel-flag-mobile {
+    padding: 0 18px 24px 18px !important;
+    box-sizing: border-box;
+  }
+  .panel-flag-mobile .sidebar-header {
+    padding: 32px 0 18px 0 !important;
+    margin-left: 0;
+    margin-right: 0;
+  }
+  .panel-flag-mobile .sidebar-title {
+    margin-bottom: 0.3em !important;
+  }
+  .panel-flag-mobile .sidebar-section {
+    margin-bottom: 22px !important;
+  }
+  .panel-flag-mobile .sidebar-section-title {
+    margin-bottom: 0.6em !important;
+    margin-top: 1.3em !important;
+    padding-bottom: 3px !important;
+  }
+  .panel-flag-mobile .sidebar-link {
+    margin-bottom: 0.3em !important;
+    margin-left: 0.5em !important;
+    padding-left: 10px !important;
+  }
+  .panel-flag-mobile .sidebar-footer {
+    margin-top: 36px !important;
   }
 }
 html, body {
