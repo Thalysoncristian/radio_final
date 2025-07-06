@@ -54,7 +54,7 @@
       </transition>
       <div class="desktop-player" :class="{ minimal: minimalPlayer }">
         <div v-if="capa" class="album-cover" style="display:flex;justify-content:center;align-items:center;margin-bottom:16px;">
-          <img :src="capa" alt="Capa do álbum" :style="styleCapa" loading="lazy" />
+          <img :src="capa" alt="Capa do álbum" :style="styleCapa" fetchpriority="high" />
         </div>
         <transition name="fade-slide">
           <div class="desktop-title impact-title" :style="styleTitulo" key="artista">{{ artista }}</div>
@@ -75,7 +75,7 @@
           <span :class="['footer-menu', {active: activePanel==='music'}]" @click="togglePanel('music')">ÉTER</span>
         </div>
         <div class="footer-center" style="display: flex; align-items: center; justify-content: center; gap: 16px; position: relative; width: 100%;">
-          <img src="/logo@capa-removebg-preview.png" alt="Logo" class="footer-logo" loading="lazy" />
+          <img src="/logo@capa-removebg-preview.webp" alt="Logo" class="footer-logo" loading="lazy" />
           <div class="footer-title">Gothic &amp; Wave</div>
         </div>
         <div class="footer-right" v-if="!minimalPlayer">
@@ -102,7 +102,7 @@
       <div v-if="activePanel === ''" class="main-clean main-player-center">
         <div class="player-info player-info-center">
           <div v-if="capa" class="album-cover album-cover-center">
-            <img :src="capa" alt="Capa do álbum" :style="styleCapa" loading="lazy" />
+            <img :src="capa" alt="Capa do álbum" :style="styleCapa" fetchpriority="high" />
           </div>
           <div class="player-title" :style="styleTitulo">{{ artista }}</div>
           <div class="player-sub" :style="styleLegenda">{{ musica }}</div>
@@ -420,6 +420,7 @@ async function updateUrls() {
   position: relative;
   width: 100%;
   min-height: 100dvh;
+  background-image: url('/bg.webp');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -554,6 +555,9 @@ async function updateUrls() {
     height: 32px;
     filter: drop-shadow(0 1px 2px #0008);
     transition: color 0.2s, filter 0.2s;
+  }
+  .main-bg {
+    background-image: url('/bg-mobile.webp');
   }
 }
 html, body {
