@@ -105,11 +105,12 @@ Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalh
 
 A **MinimalWave Radio** é um projeto da [AzuraQuest](https://azura.quest/), hospedada em um VPS de alta performance da Hostinger. Utilizamos a infraestrutura robusta da Hostinger para garantir estabilidade e qualidade no streaming 24/7.
 
-## 🔗 Integração com AzuraCast
+## 🔗 Integração com Metadados (AzuraQuest)
 
-A rádio utiliza a **API do AzuraCast** para puxar em tempo real os metadados das músicas que estão tocando, como título, artista e capa do álbum. Isso permite uma experiência dinâmica e informativa para os ouvintes.
+A rádio utiliza a **API pública da AzuraQuest** para puxar em tempo real os metadados das músicas que estão tocando, como título, artista e capa do álbum. Esta API é open source e está disponível no GitHub.
 
-- **Link dos metadados:** [https://radio.azura.quest/api/nowplaying/1](https://radio.azura.quest/api/nowplaying/1)
+- **Link dos metadados:** [https://mlinsights.fun/api/nowplaying](https://mlinsights.fun/api/nowplaying)
+- **Repositório da API:** [https://github.com/Thalysoncristian/azura-api](https://github.com/Thalysoncristian/azura-api)
 
 ## 📞 Contato
 
