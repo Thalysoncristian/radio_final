@@ -278,9 +278,10 @@ function upper(str) {
 async function fetchCurrentSong() {
   try {
     const apiUrl = 'https://mlinsights.fun/api/nowplaying';
+    const token = import.meta.env.VITE_API_TOKEN;
     const res = await fetch(apiUrl, {
       headers: {
-        'Authorization': 'Bearer bd0af7ebc28a76ee:080c11920e7551b3665d74bc4789394e'
+        'Authorization': `Bearer ${token}`
       }
     });
     if (!res.ok) {
