@@ -101,10 +101,20 @@ Ajustes de build e desenvolvimento podem ser feitos no arquivo `vite.config.js`.
 
 Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
 
+## 🏢 Sobre a Rádio
+
+A **MinimalWave Radio** é um projeto da [AzuraQuest](https://azura.quest/), hospedada em um VPS de alta performance da Hostinger. Utilizamos a infraestrutura robusta da Hostinger para garantir estabilidade e qualidade no streaming 24/7.
+
+## 🔗 Integração com AzuraCast
+
+A rádio utiliza a **API do AzuraCast** para puxar em tempo real os metadados das músicas que estão tocando, como título, artista e capa do álbum. Isso permite uma experiência dinâmica e informativa para os ouvintes.
+
+- **Link dos metadados:** [https://radio.azura.quest/api/nowplaying/1](https://radio.azura.quest/api/nowplaying/1)
+
 ## 📞 Contato
 
 - **Website**: https://radiofinal.netlify.app/
-- **Email**: [SEU_EMAIL]
+- **Email**: thalysoncristian19@gmail.com
 
 ---
 
