@@ -65,7 +65,7 @@ function sendMessage() {
   }
 }
 function connectSocket() {
-  socket = io('wss://srv895506.hstgr.cloud/chat', {
+  socket = io('wss://gothicandwave.site/chat', {
     path: '/chat/socket.io'
   })
   socket.on('receive_message', (msg) => {
