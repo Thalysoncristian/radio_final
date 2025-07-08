@@ -353,6 +353,26 @@ async function fetchCurrentSong() {
         };
       });
     }
+
+    // Adiciona Media Session API para mostrar informações na notificação de mídia
+    if ('mediaSession' in navigator) {
+      navigator.mediaSession.metadata = new window.MediaMetadata({
+        title: musica.value,
+        artist: artista.value,
+        album: '', // Preencha se quiser
+        artwork: [
+          { src: capa.value, sizes: '512x512', type: 'image/jpeg' }
+        ]
+      });
+      navigator.mediaSession.setActionHandler('play', () => {
+        playing.value = true;
+        if (audioRef.value) audioRef.value.play();
+      });
+      navigator.mediaSession.setActionHandler('pause', () => {
+        playing.value = false;
+        if (audioRef.value) audioRef.value.pause();
+      });
+    }
   } catch (e) {
     // Em caso de erro, mantém os dados padrão
   }
