@@ -185,6 +185,7 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount, computed, watch } from 'vue'
 import ChatBox from '../components/ChatBox.vue'
+import { io } from 'socket.io-client'
 
 const activePanel = ref('')
 const playing = ref(false)
@@ -268,6 +269,10 @@ onMounted(async () => {
     window.addEventListener('touchmove', preventScroll, { passive: false })
   }
   carregarConfig();
+
+  const socket = io('wss://gothicandwave.site/chat', {
+    path: '/chat/socket.io'
+  });
 })
 
 function preventScroll(e) {
