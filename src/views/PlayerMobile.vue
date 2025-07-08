@@ -173,16 +173,18 @@
         <button :class="['footer-btn', {active: activePanel==='music'}]" @click="togglePanel('music')" aria-label="Histórico">
           <span class="footer-icon-wrap"><svg width="32" height="32" fill="none" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13" stroke="#181716" stroke-width="2" fill="currentColor"/><circle cx="6" cy="18" r="3" fill="currentColor"/><circle cx="18" cy="16" r="3" fill="currentColor"/></svg></span>
         </button>
-        <button :class="['footer-btn', {active: activePanel==='photo'}]" @click="togglePanel('photo')" aria-label="Foto">
-          <span class="footer-icon-wrap"><svg width="32" height="32" fill="none" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" fill="currentColor" stroke="#181716" stroke-width="2"/><circle cx="12" cy="12" r="3.5" fill="#181716"/></svg></span>
+        <button :class="['footer-btn', {active: showChat}]" @click="showChat = !showChat" aria-label="Chat">
+          <span class="footer-icon-wrap"><svg width="32" height="32" fill="none" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" fill="currentColor" stroke="#181716" stroke-width="2"/></svg></span>
         </button>
       </footer>
     </div>
+    <ChatBox v-if="showChat" @close="showChat = false" />
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, onBeforeUnmount, computed, watch } from 'vue'
+import ChatBox from '../components/ChatBox.vue'
 
 const activePanel = ref('')
 const playing = ref(false)
@@ -216,6 +218,7 @@ const mainBgStyle = computed(() => ({
 }))
 
 const minimalPlayer = ref(false)
+const showChat = ref(false)
 
 function togglePanel(panel) {
   if (panel === 'photo') {
@@ -1006,10 +1009,6 @@ html, body {
   justify-content: center;
   cursor: pointer;
   position: relative;
-  border-radius: 50%;
-  width: 48px;
-  height: 48px;
-  transition: background 0.18s, box-shadow 0.18s;
 }
 .footer-btn.active, .footer-btn:focus, .footer-btn:hover {
   background: rgba(255, 224, 102, 0.10);
@@ -1026,8 +1025,6 @@ html, body {
   color: var(--color-text);
   filter: drop-shadow(0 1px 2px #0008);
   transition: color 0.2s, filter 0.2s;
-  width: 32px;
-  height: 32px;
 }
 .footer-btn.active .footer-icon-wrap,
 .footer-btn:focus .footer-icon-wrap,
@@ -1602,5 +1599,38 @@ html, body {
 .desktop-player.minimal {
   border: none !important;
   box-shadow: none !important;
+}
+.chat-fab {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #ffe066;
+  color: #181716;
+  font-size: 2rem;
+  box-shadow: 0 4px 24px #000a;
+  border: none;
+  cursor: pointer;
+  z-index: 1500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.18s, box-shadow 0.18s, transform 0.18s;
+}
+.chat-fab:hover {
+  background: #fffbe6;
+  box-shadow: 0 8px 32px #000c;
+  transform: scale(1.08);
+}
+@media (max-width: 600px) {
+  .chat-fab {
+    right: 2vw;
+    bottom: 2vw;
+    width: 52px;
+    height: 52px;
+    font-size: 1.7rem;
+  }
 }
 </style> 
