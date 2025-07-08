@@ -60,6 +60,7 @@ function logout() {
 function sendMessage() {
   if (!message.value.trim()) return
   if (socket) {
+    console.log('Enviando mensagem:', { username: username.value, text: message.value })
     socket.emit('send_message', { username: username.value, text: message.value })
     message.value = ''
   }
@@ -69,6 +70,7 @@ function connectSocket() {
     path: '/chat/socket.io'
   })
   socket.on('receive_message', (msg) => {
+    console.log('Mensagem recebida:', msg)
     messages.value.push(msg)
     scrollToBottom()
   })
