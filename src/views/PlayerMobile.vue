@@ -270,7 +270,7 @@ onMounted(async () => {
   }
   carregarConfig();
 
-  const socket = io('wss://gothicandwave.site/chat', {
+  const socket = io('wss://mlinsights.fun/chat', {
     path: '/chat/socket.io'
   });
 })

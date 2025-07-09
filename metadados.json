@@ -1,0 +1,196 @@
+[
+    {
+      "station": {
+        "id": 1,
+        "name": "Thalyson",
+        "shortcode": "thalyson",
+        "description": "",
+        "frontend": "icecast",
+        "backend": "liquidsoap",
+        "timezone": "UTC",
+        "listen_url": "https://mlinsights.fun/listen/thalyson/radio.mp3",
+        "url": "https://gothwave.ml",
+        "public_player_url": "https://mlinsights.fun/public/thalyson",
+        "playlist_pls_url": "https://mlinsights.fun/public/thalyson/playlist.pls",
+        "playlist_m3u_url": "https://mlinsights.fun/public/thalyson/playlist.m3u",
+        "is_public": true,
+        "mounts": [
+          {
+            "id": 1,
+            "name": "/radio.mp3 (192kbps MP3)",
+            "url": "https://mlinsights.fun/listen/thalyson/radio.mp3",
+            "bitrate": 192,
+            "format": "mp3",
+            "listeners": {
+              "total": 3,
+              "unique": 3,
+              "current": 3
+            },
+            "path": "/radio.mp3",
+            "is_default": true
+          }
+        ],
+        "remotes": [],
+        "hls_enabled": false,
+        "hls_is_default": false,
+        "hls_url": null,
+        "hls_listeners": 0
+      },
+      "listeners": {
+        "total": 3,
+        "unique": 3,
+        "current": 3
+      },
+      "live": {
+        "is_live": false,
+        "streamer_name": "",
+        "broadcast_start": null,
+        "art": null
+      },
+      "now_playing": {
+        "sh_id": 609,
+        "played_at": 1751815976,
+        "duration": 253,
+        "playlist": "80s",
+        "streamer": "",
+        "is_request": false,
+        "song": {
+          "id": "fb5c47f7274ad8d82c187a47b01af1cd",
+          "art": "https://mlinsights.fun/api/station/thalyson/art/bac100e727d43a5a6d8b7532-1751806377.jpg",
+          "custom_fields": [],
+          "text": "Lunapark - Gefangene Vögel - Worte",
+          "artist": "Lunapark",
+          "title": "Worte",
+          "album": "Gefangene Vögel",
+          "genre": "",
+          "isrc": "",
+          "lyrics": ""
+        },
+        "elapsed": 170,
+        "remaining": 83
+      },
+      "playing_next": {
+        "cued_at": 1751815775,
+        "played_at": 1751816222,
+        "duration": 285.3120020185,
+        "playlist": "80s",
+        "is_request": false,
+        "song": {
+          "id": "ad6be12d8413781c304e6ab9e5283252",
+          "art": "https://mlinsights.fun/api/station/thalyson/art/688855707273514c16aa0079",
+          "custom_fields": [],
+          "text": "035 - Camera Obscura - Moving The Mercury",
+          "artist": "035",
+          "title": "Moving The Mercury",
+          "album": "Camera Obscura",
+          "genre": "",
+          "isrc": "",
+          "lyrics": ""
+        }
+      },
+      "song_history": [
+        {
+          "sh_id": 608,
+          "played_at": 1751815780,
+          "duration": 199,
+          "playlist": "80s",
+          "streamer": "",
+          "is_request": false,
+          "song": {
+            "id": "33bab429aa59392cd2ed5dc5d6bbd3ed",
+            "art": "https://mlinsights.fun/api/station/thalyson/art/8e07ca75ccd2dbcb1a632151",
+            "custom_fields": [],
+            "text": "049 - Madame Bovary - Be My Friend (In Spite Of All)",
+            "artist": "049",
+            "title": "Be My Friend (In Spite Of All)",
+            "album": "Madame Bovary",
+            "genre": "",
+            "isrc": "",
+            "lyrics": ""
+          }
+        },
+        {
+          "sh_id": 607,
+          "played_at": 1751815528,
+          "duration": 255,
+          "playlist": "80s",
+          "streamer": "",
+          "is_request": false,
+          "song": {
+            "id": "617c2f7314f8ae86c739d7bd5fe562e7",
+            "art": "https://mlinsights.fun/api/station/thalyson/art/61ae5951e101b1880c16d621-1751806368.jpg",
+            "custom_fields": [],
+            "text": "Thomas Nöla - Animals & Children (Grandest Hits: 2006-2016) - Henry Pelham",
+            "artist": "Thomas Nöla",
+            "title": "Henry Pelham",
+            "album": "Animals & Children (Grandest Hits: 2006-2016)",
+            "genre": "",
+            "isrc": "",
+            "lyrics": ""
+          }
+        },
+        {
+          "sh_id": 606,
+          "played_at": 1751815279,
+          "duration": 251,
+          "playlist": "80s",
+          "streamer": "",
+          "is_request": false,
+          "song": {
+            "id": "010a37a339bf2f952f4e3c7d872506d5",
+            "art": "https://mlinsights.fun/api/station/thalyson/art/b93f9047fcbfc42652d4240f",
+            "custom_fields": [],
+            "text": "Native Alien - The Music Has Landed - Ways Of A Man",
+            "artist": "Native Alien",
+            "title": "Ways Of A Man",
+            "album": "The Music Has Landed",
+            "genre": "",
+            "isrc": "",
+            "lyrics": ""
+          }
+        },
+        {
+          "sh_id": 605,
+          "played_at": 1751814957,
+          "duration": 324,
+          "playlist": "80s",
+          "streamer": "",
+          "is_request": false,
+          "song": {
+            "id": "bb9cc75d0a1c234599ed0d566b2b5de3",
+            "art": "https://mlinsights.fun/api/station/thalyson/art/8a9782c2c1c39f4f73ef9234",
+            "custom_fields": [],
+            "text": "012 - Resistance - Die Out (1986)",
+            "artist": "012",
+            "title": "Die Out (1986)",
+            "album": "Resistance",
+            "genre": "",
+            "isrc": "",
+            "lyrics": ""
+          }
+        },
+        {
+          "sh_id": 604,
+          "played_at": 1751814702,
+          "duration": 257,
+          "playlist": "80s",
+          "streamer": "",
+          "is_request": false,
+          "song": {
+            "id": "bc6c0deb87d19c94fceb70c0ceef7512",
+            "art": "https://mlinsights.fun/api/station/thalyson/art/252aeabaa743be411ae9c902",
+            "custom_fields": [],
+            "text": "Twisted Nerve - Secret Records Compilation 2021 1/2 - Séance",
+            "artist": "Twisted Nerve",
+            "title": "Séance",
+            "album": "Secret Records Compilation 2021 1/2",
+            "genre": "",
+            "isrc": "",
+            "lyrics": ""
+          }
+        }
+      ],
+      "is_online": true,
+      "cache": null
+    }
+  ]
