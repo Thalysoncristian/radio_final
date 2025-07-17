@@ -1,5 +1,13 @@
 # 🎵 MinimalWave Radio
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Thalysoncristian/Thalysoncristian/output/pacman-contribution-graph-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/Thalysoncristian/Thalysoncristian/output/pacman-contribution-graph.svg">
+  <img alt="pacman contribution graph" src="https://raw.githubusercontent.com/Thalysoncristian/Thalysoncristian/output/pacman-contribution-graph.svg">
+</picture>
+
+###
+
 Uma aplicação web moderna para streaming de rádio especializada em música gótica, darkwave e synth. Desenvolvida com Vue.js 3 e Vite.
 
 ![MinimalWave Radio](https://radiofinal.netlify.app/capa2.jpg)
