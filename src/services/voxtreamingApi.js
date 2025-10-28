@@ -82,7 +82,7 @@ class VoxtreamingApiService {
         ip: rawData.ip || '',
         port: rawData.porta || '',
         djPort: rawData.porta_dj || '',
-        shoutcastUrl: rawData.shoutcast || '',
+        shoutcastUrl: rawData.shoutcast || this.buildShoutcastUrl(rawData),
         rtmpUrl: rawData.rtmp || '',
         rtspUrl: rawData.rtsp || ''
       },
@@ -114,6 +114,26 @@ class VoxtreamingApiService {
       // Timestamp para controle de cache
       timestamp: Date.now()
     }
+  }
+
+  /**
+   * Constrói URL do Shoutcast baseada nos dados da API
+   * @param {Object} rawData - Dados brutos da API
+   * @returns {string} URL do Shoutcast
+   */
+  buildShoutcastUrl(rawData) {
+    const ip = rawData.ip || 'stm4.voxtreaming.com.br'
+    const port = rawData.porta || '6920'
+    
+    // Tenta diferentes formatos de URL
+    const urls = [
+      `https://player.voxtreaming.com.br/stream/${port}`, // Player web do Voxtreaming
+      `http://${ip}:${port}/stream`, // Stream direto
+      `http://${ip}:${port}`, // URL básica
+      `https://${ip}:${port}` // HTTPS
+    ]
+    
+    return urls[0] // Usa o player web como primeira opção
   }
 
   /**

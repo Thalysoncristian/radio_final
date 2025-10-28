@@ -3,6 +3,18 @@
     <div class="bg-overlay"></div>
     <!-- Elemento de áudio invisível -->
     <audio ref="audioRef" :src="radioUrl" preload="none"></audio>
+    
+    <!-- Player iframe como fallback (invisível) -->
+    <iframe 
+      v-if="useIframePlayer" 
+      ref="iframeRef"
+      :src="iframeUrl" 
+      frameborder="0" 
+      width="0" 
+      height="0"
+      style="display: none;"
+      @load="onIframeLoad">
+    </iframe>
     <!-- Layout Desktop -->
     <div v-if="isDesktop" class="desktop-layout">
       <!-- Sidebar Bandeira -->
@@ -77,6 +89,14 @@
         <div v-else-if="!isOnline" class="api-status offline">
           📻 Rádio offline
         </div>
+        <!-- Indicador do tipo de player -->
+        <div v-if="useIframePlayer" class="api-status info">
+          🎵 Usando Player Web
+        </div>
+        <!-- Botão de teste do stream -->
+        <button @click="testStream" class="test-stream-btn">
+          🧪 Testar Stream
+        </button>
       </div>
       <!-- Rodapé Desktop -->
       <footer class="desktop-footer">
@@ -131,6 +151,14 @@
           <div v-else-if="!isOnline" class="api-status-mobile offline">
             📻 Offline
           </div>
+          <!-- Indicador do tipo de player Mobile -->
+          <div v-if="useIframePlayer" class="api-status-mobile info">
+            🎵 Player Web
+          </div>
+          <!-- Botão de teste do stream Mobile -->
+          <button @click="testStream" class="test-stream-btn-mobile">
+            🧪 Testar
+          </button>
         </div>
       </div>
       <!-- Painel: Bandeira -->
@@ -234,8 +262,10 @@ const historico = ref([])
 const bgImages = ['/bg_optimized.jpg']
 const bgIndex = ref(0)
 const isDesktop = ref(window.innerWidth >= 768)
-const radioUrl = ref('http://stm4.voxtreaming.com.br:6920')
+const radioUrl = ref('https://player.voxtreaming.com.br/stream/6920')
 const audioRef = ref(null)
+const iframeRef = ref(null)
+const useIframePlayer = ref(false)
 const volume = ref(0.8)
 const ouvintes = ref(0)
 
@@ -256,6 +286,11 @@ const mainBgStyle = computed(() => ({
 const minimalPlayer = ref(false)
 const showChat = ref(false)
 
+// Computed para URL do iframe
+const iframeUrl = computed(() => {
+  return `https://player.voxtreaming.com.br/player-web/6920`
+})
+
 function togglePanel(panel) {
   if (panel === 'photo') {
     trocarCor();
@@ -264,14 +299,80 @@ function togglePanel(panel) {
   activePanel.value = activePanel.value === panel ? '' : panel
 }
 function togglePlay() {
+  console.log('🎵 Tentando tocar/pausar áudio...')
+  console.log('📻 URL do stream:', radioUrl.value)
+  console.log('🔊 Elemento de áudio:', audioRef.value)
+  
   playing.value = !playing.value
-  if (audioRef.value) {
-    if (playing.value) {
-      audioRef.value.play()
+  
+  if (playing.value) {
+    console.log('▶️ Iniciando reprodução...')
+    
+    // Primeiro tenta com elemento audio
+    if (audioRef.value && !useIframePlayer.value) {
+      tryAudioPlay()
     } else {
+      // Se audio falhou ou está usando iframe, usa iframe
+      useIframePlayer.value = true
+      console.log('🔄 Usando player iframe como fallback')
+    }
+  } else {
+    console.log('⏸️ Pausando reprodução...')
+    if (audioRef.value) {
       audioRef.value.pause()
     }
+    // Para iframe, não há como pausar diretamente
   }
+}
+
+function tryAudioPlay() {
+  if (!audioRef.value) return
+  
+  // Adiciona tratamento de erro para o áudio
+  audioRef.value.addEventListener('error', (e) => {
+    console.error('❌ Erro no áudio:', e)
+    console.error('❌ Detalhes do erro:', audioRef.value.error)
+    playing.value = false
+    
+    // Se audio falhar, tenta iframe
+    console.log('🔄 Audio falhou, tentando iframe...')
+    useIframePlayer.value = true
+  })
+  
+  audioRef.value.addEventListener('loadstart', () => {
+    console.log('🔄 Carregando stream...')
+  })
+  
+  audioRef.value.addEventListener('canplay', () => {
+    console.log('✅ Stream pronto para reprodução')
+  })
+  
+  audioRef.value.addEventListener('playing', () => {
+    console.log('🎵 Reprodução iniciada com sucesso!')
+  })
+  
+  // Tenta reproduzir
+  audioRef.value.play().catch(error => {
+    console.error('❌ Erro ao iniciar reprodução:', error)
+    playing.value = false
+    
+    // Mostra mensagem de erro mais específica
+    if (error.name === 'NotAllowedError') {
+      console.error('❌ Reprodução bloqueada pelo navegador. Clique em qualquer lugar da página primeiro.')
+    } else if (error.name === 'NotSupportedError') {
+      console.error('❌ Formato de áudio não suportado')
+    } else {
+      console.error('❌ Erro desconhecido:', error.message)
+    }
+    
+    // Se audio falhar, tenta iframe
+    console.log('🔄 Audio falhou, tentando iframe...')
+    useIframePlayer.value = true
+  })
+}
+
+function onIframeLoad() {
+  console.log('✅ Iframe player carregado')
 }
 function trocarCor() {
   bgIndex.value = (bgIndex.value + 1) % bgImages.length
@@ -464,6 +565,47 @@ function toggleMinimalPlayer() {
 // Função para forçar atualização dos dados da API
 function forceRefresh() {
   refresh()
+}
+
+// Função para testar o stream de áudio
+function testStream() {
+  console.log('🧪 Testando stream de áudio...')
+  console.log('📻 URL atual:', radioUrl.value)
+  
+  // Testa se a URL responde
+  fetch(radioUrl.value, { 
+    method: 'HEAD',
+    mode: 'no-cors'
+  }).then(() => {
+    console.log('✅ Stream URL responde')
+  }).catch(error => {
+    console.error('❌ Stream URL não responde:', error)
+  })
+  
+  // Testa com elemento de áudio temporário
+  const testAudio = new Audio()
+  testAudio.src = radioUrl.value
+  
+  testAudio.addEventListener('loadstart', () => {
+    console.log('🔄 Teste: Carregando stream...')
+  })
+  
+  testAudio.addEventListener('canplay', () => {
+    console.log('✅ Teste: Stream pode ser reproduzido')
+  })
+  
+  testAudio.addEventListener('error', (e) => {
+    console.error('❌ Teste: Erro no stream:', e)
+    console.error('❌ Teste: Detalhes:', testAudio.error)
+  })
+  
+  testAudio.addEventListener('playing', () => {
+    console.log('🎵 Teste: Stream tocando com sucesso!')
+    testAudio.pause()
+  })
+  
+  // Tenta carregar o stream
+  testAudio.load()
 }
 </script>
 
@@ -1676,6 +1818,12 @@ html, body {
   border: 1px solid rgba(108, 117, 125, 0.3);
 }
 
+.api-status.info {
+  background: rgba(0, 123, 255, 0.2);
+  color: #007bff;
+  border: 1px solid rgba(0, 123, 255, 0.3);
+}
+
 .api-status-mobile {
   font-size: 0.8rem;
   padding: 3px 6px;
@@ -1702,5 +1850,48 @@ html, body {
   background: rgba(108, 117, 125, 0.2);
   color: #6c757d;
   border: 1px solid rgba(108, 117, 125, 0.3);
+}
+
+.api-status-mobile.info {
+  background: rgba(0, 123, 255, 0.2);
+  color: #007bff;
+  border: 1px solid rgba(0, 123, 255, 0.3);
+}
+
+/* Botões de teste do stream */
+.test-stream-btn {
+  background: rgba(0, 123, 255, 0.2);
+  color: #007bff;
+  border: 1px solid rgba(0, 123, 255, 0.3);
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-top: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.test-stream-btn:hover {
+  background: rgba(0, 123, 255, 0.3);
+  color: #0056b3;
+}
+
+.test-stream-btn-mobile {
+  background: rgba(0, 123, 255, 0.2);
+  color: #007bff;
+  border: 1px solid rgba(0, 123, 255, 0.3);
+  padding: 4px 8px;
+  border-radius: 3px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  margin-top: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.test-stream-btn-mobile:hover {
+  background: rgba(0, 123, 255, 0.3);
+  color: #0056b3;
 }
 </style> 

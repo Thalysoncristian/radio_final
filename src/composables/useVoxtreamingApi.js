@@ -135,7 +135,8 @@ export function useVoxtreamingApi() {
    */
   function getStreamUrl() {
     const shoutcastUrl = serverInfo.value.shoutcastUrl
-    return shoutcastUrl || 'http://stm4.voxtreaming.com.br:6920'
+    // Usa o player web do Voxtreaming que funciona
+    return shoutcastUrl || 'https://player.voxtreaming.com.br/stream/6920'
   }
 
   /**
