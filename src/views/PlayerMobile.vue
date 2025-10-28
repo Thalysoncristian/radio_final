@@ -192,14 +192,14 @@ const playing = ref(false)
 const artista = ref('PRÓTON-4')
 const musica = ref('NA ÓRBITA DA TERRA')
 const cidade = ref('BELÉM / PA')
-const capa = ref('https://mlinsights.fun/api/station/thalyson/art/82f9d9bfe4f386237bc16f21-1751521257.jpg')
+const capa = ref('http://stm4.voxtreaming.com.br:6920')
 
 const historico = ref([])
 
 const bgImages = ['/bg_optimized.jpg']
 const bgIndex = ref(0)
 const isDesktop = ref(window.innerWidth >= 768)
-const radioUrl = ref('https://mlinsights.fun/listen/thalyson/radio.mp3')
+const radioUrl = ref('http://stm4.voxtreaming.com.br:6920')
 const audioRef = ref(null)
 const volume = ref(0.8)
 const ouvintes = ref(0)
@@ -285,7 +285,7 @@ function upper(str) {
 
 async function fetchCurrentSong() {
   try {
-    const apiUrl = 'https://mlinsights.fun/api/nowplaying';
+    const apiUrl = 'http://stm4.voxtreaming.com.br:6920';
     const token = import.meta.env.VITE_API_TOKEN;
     const res = await fetch(apiUrl, {
       headers: {
@@ -319,7 +319,7 @@ async function fetchCurrentSong() {
       if (song.art.startsWith('http')) {
         capa.value = song.art;
       } else {
-        capa.value = `https://mlinsights.fun${song.art}`;
+        capa.value = `https://painel.voxtreaming.com.br/api/Vkcxd2NtVlZNVUpRVkRBOStS`;
       }
     } else {
       capa.value = '/capa.jpg';
@@ -454,8 +454,8 @@ function toggleMinimalPlayer() {
 
 // Função para atualizar URLs baseada no domínio anterior
 async function updateUrls() {
-  radioUrl.value = 'https://mlinsights.fun/listen/thalyson/radio.mp3';
-  capa.value = 'https://mlinsights.fun/api/station/thalyson/art/82f9d9bfe4f386237bc16f21-1751521257.jpg';
+  radioUrl.value = 'http://stm4.voxtreaming.com.br:6920';
+  capa.value = 'https://painel.voxtreaming.com.br/api/Vkcxd2NtVlZNVUpRVkRBOStS';
 }
 </script>
 
