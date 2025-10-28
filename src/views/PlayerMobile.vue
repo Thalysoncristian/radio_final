@@ -67,6 +67,16 @@
           <svg v-else width="60" height="60" viewBox="0 0 54 54" fill="none"><rect x="16" y="14" width="7" height="26" rx="2" fill="#fff"/><rect x="31" y="14" width="7" height="26" rx="2" fill="#fff"/></svg>
         </button>
         <div class="desktop-city">{{ cidade }}</div>
+        <!-- Indicador de status da API -->
+        <div v-if="error" class="api-status error">
+          ⚠️ Erro na API: {{ error }}
+        </div>
+        <div v-else-if="isLoading" class="api-status loading">
+          🔄 Atualizando dados...
+        </div>
+        <div v-else-if="!isOnline" class="api-status offline">
+          📻 Rádio offline
+        </div>
       </div>
       <!-- Rodapé Desktop -->
       <footer class="desktop-footer">
@@ -111,6 +121,16 @@
             <svg v-else width="54" height="54" viewBox="0 0 54 54" fill="none"><rect x="16" y="14" width="7" height="26" rx="2" fill="#fff"/><rect x="31" y="14" width="7" height="26" rx="2" fill="#fff"/></svg>
           </button>
           <div class="player-city">{{ cidade }}</div>
+          <!-- Indicador de status da API Mobile -->
+          <div v-if="error" class="api-status-mobile error">
+            ⚠️ {{ error }}
+          </div>
+          <div v-else-if="isLoading" class="api-status-mobile loading">
+            🔄 Atualizando...
+          </div>
+          <div v-else-if="!isOnline" class="api-status-mobile offline">
+            📻 Offline
+          </div>
         </div>
       </div>
       <!-- Painel: Bandeira -->
@@ -186,6 +206,21 @@
 import { ref, onMounted, onBeforeUnmount, computed, watch } from 'vue'
 import ChatBox from '../components/ChatBox.vue'
 import { io } from 'socket.io-client'
+import { useVoxtreamingApi } from '../composables/useVoxtreamingApi.js'
+
+// Usa o composable da API do Voxtreaming
+const {
+  isLoading,
+  error,
+  isOnline,
+  formattedArtist,
+  formattedTitle,
+  formattedListeners,
+  formattedCoverUrl,
+  getStreamUrl,
+  getHistoryEntry,
+  refresh
+} = useVoxtreamingApi()
 
 const activePanel = ref('')
 const playing = ref(false)
@@ -252,17 +287,67 @@ watch(volume, (val) => {
     audioRef.value.volume = val
   }
 })
+// Watchers para atualizar dados quando a API muda
+watch(formattedArtist, (newArtist) => {
+  if (newArtist) {
+    artista.value = newArtist
+  }
+})
+
+watch(formattedTitle, (newTitle) => {
+  if (newTitle) {
+    musica.value = newTitle
+  }
+})
+
+watch(formattedListeners, (newListeners) => {
+  ouvintes.value = newListeners
+})
+
+watch(formattedCoverUrl, (newCover) => {
+  if (newCover) {
+    capa.value = newCover
+  }
+})
+
+watch(getStreamUrl, (newUrl) => {
+  if (newUrl) {
+    radioUrl.value = newUrl
+  }
+})
+
+// Adiciona entrada ao histórico quando a música muda
+watch([formattedArtist, formattedTitle], ([newArtist, newTitle]) => {
+  if (newArtist && newTitle) {
+    const historyEntry = getHistoryEntry()
+    if (historyEntry) {
+      // Verifica se já existe no histórico
+      const exists = historico.value.some(item => 
+        item.artista === historyEntry.artista && 
+        item.musica === historyEntry.musica
+      )
+      
+      if (!exists) {
+        historico.value.unshift(historyEntry)
+        // Mantém apenas os últimos 50 itens
+        if (historico.value.length > 50) {
+          historico.value = historico.value.slice(0, 50)
+        }
+      }
+    }
+  }
+})
+
 onMounted(async () => {
   window.addEventListener('resize', handleResize)
   
-  // Detecta o melhor protocolo e atualiza URLs
-  await updateUrls();
+  // Atualiza URL do stream
+  radioUrl.value = getStreamUrl()
   
   if (audioRef.value) {
     audioRef.value.volume = volume.value
   }
-  fetchCurrentSong();
-  setInterval(fetchCurrentSong, 10000);
+  
   if (window.innerWidth < 768) {
     lockScroll()
     // Bloqueia scroll por touch no mobile
@@ -283,108 +368,32 @@ function upper(str) {
   return (str || '').toUpperCase();
 }
 
-async function fetchCurrentSong() {
-  try {
-    const apiUrl = 'http://stm4.voxtreaming.com.br:6920';
-    const token = import.meta.env.VITE_API_TOKEN;
-    const res = await fetch(apiUrl, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
+// Função para atualizar Media Session API
+function updateMediaSession() {
+  if ('mediaSession' in navigator) {
+    navigator.mediaSession.metadata = new window.MediaMetadata({
+      title: musica.value,
+      artist: artista.value,
+      album: '', // Preencha se quiser
+      artwork: [
+        { src: capa.value, sizes: '512x512', type: 'image/jpeg' }
+      ]
     });
-    if (!res.ok) {
-      throw new Error(`HTTP ${res.status}: ${res.statusText}`);
-    }
-    const data = await res.json();
-
-    // Se houver mais de uma estação, pegue a primeira (ou ajuste para sua estação)
-    const station = Array.isArray(data) ? data[0] : data;
-
-    // Metadados disponíveis
-    const nowPlaying = station.now_playing || {};
-    const song = nowPlaying.song || {};
-    const art = nowPlaying.art || '';
-    const elapsed = nowPlaying.elapsed || 0;
-    const duration = nowPlaying.duration || 0;
-    const playlist = station.playlist || '';
-    const listeners = station.listeners?.current || 0;
-
-    // Exemplo de como popular variáveis reativas
-    artista.value = (song.artist || '').toUpperCase();
-    const musicaFormatada = (song.title || '').replace(/\s*[\r\n]+\s*/g, ' ').toUpperCase();
-    musica.value = musicaFormatada;
-    
-    // Tratamento inteligente da URL da capa
-    if (song.art && song.art.trim() !== '') {
-      if (song.art.startsWith('http')) {
-        capa.value = song.art;
-      } else {
-        capa.value = `https://painel.voxtreaming.com.br/api/Vkcxd2NtVlZNVUpRVkRBOStS`;
-      }
-    } else {
-      capa.value = '/capa.jpg';
-    }
-    
-    ouvintes.value = listeners;
-
-    // Adicione ao histórico, se desejar
-    const hora = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-    const novaEntrada = { hora, artista: artista.value, musica: musicaFormatada };
-    if (
-      !historico.value.length ||
-      historico.value[0].artista !== novaEntrada.artista ||
-      historico.value[0].musica !== novaEntrada.musica
-    ) {
-      historico.value.unshift(novaEntrada);
-      if (historico.value.length > 50) historico.value.pop();
-    }
-
-    // Preencher histórico ao abrir a página
-    if (station.song_history && Array.isArray(station.song_history)) {
-      historico.value = station.song_history.slice(0, 50).map(item => {
-        const artist = item.song?.artist || '';
-        const title = item.song?.title || '';
-        return {
-          hora: new Date(item.played_at * 1000).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
-          artista: artist.toUpperCase(),
-          musica: title.replace(/\s*[\r\n]+\s*/g, ' ').toUpperCase()
-        };
-      });
-    } else if (station.history && Array.isArray(station.history)) {
-      historico.value = station.history.slice(0, 50).map(item => {
-        const artist = item.song?.artist || '';
-        const title = item.song?.title || '';
-        return {
-          hora: new Date(item.played_at * 1000).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
-          artista: artist.toUpperCase(),
-          musica: title.replace(/\s*[\r\n]+\s*/g, ' ').toUpperCase()
-        };
-      });
-    }
-
-    // Adiciona Media Session API para mostrar informações na notificação de mídia
-    if ('mediaSession' in navigator) {
-      navigator.mediaSession.metadata = new window.MediaMetadata({
-        title: musica.value,
-        artist: artista.value,
-        album: '', // Preencha se quiser
-        artwork: [
-          { src: capa.value, sizes: '512x512', type: 'image/jpeg' }
-        ]
-      });
-      navigator.mediaSession.setActionHandler('play', () => {
-        playing.value = true;
-        if (audioRef.value) audioRef.value.play();
-      });
-      navigator.mediaSession.setActionHandler('pause', () => {
-        playing.value = false;
-        if (audioRef.value) audioRef.value.pause();
-      });
-    }
-  } catch (e) {
-    // Em caso de erro, mantém os dados padrão
+    navigator.mediaSession.setActionHandler('play', () => {
+      playing.value = true;
+      if (audioRef.value) audioRef.value.play();
+    });
+    navigator.mediaSession.setActionHandler('pause', () => {
+      playing.value = false;
+      if (audioRef.value) audioRef.value.pause();
+    });
   }
 }
+
+// Atualiza Media Session quando os dados mudam
+watch([musica, artista, capa], () => {
+  updateMediaSession()
+})
 
 function lockScroll() {
   document.body.style.overflow = 'hidden'
@@ -452,10 +461,9 @@ function toggleMinimalPlayer() {
   minimalPlayer.value = !minimalPlayer.value
 }
 
-// Função para atualizar URLs baseada no domínio anterior
-async function updateUrls() {
-  radioUrl.value = 'http://stm4.voxtreaming.com.br:6920';
-  capa.value = 'https://painel.voxtreaming.com.br/api/Vkcxd2NtVlZNVUpRVkRBOStS';
+// Função para forçar atualização dos dados da API
+function forceRefresh() {
+  refresh()
 }
 </script>
 
@@ -1637,5 +1645,62 @@ html, body {
     height: 52px;
     font-size: 1.7rem;
   }
+}
+
+/* Indicadores de status da API */
+.api-status {
+  font-size: 0.9rem;
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin-top: 8px;
+  text-align: center;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.api-status.error {
+  background: rgba(255, 0, 0, 0.2);
+  color: #ff6b6b;
+  border: 1px solid rgba(255, 0, 0, 0.3);
+}
+
+.api-status.loading {
+  background: rgba(255, 193, 7, 0.2);
+  color: #ffc107;
+  border: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+.api-status.offline {
+  background: rgba(108, 117, 125, 0.2);
+  color: #6c757d;
+  border: 1px solid rgba(108, 117, 125, 0.3);
+}
+
+.api-status-mobile {
+  font-size: 0.8rem;
+  padding: 3px 6px;
+  border-radius: 3px;
+  margin-top: 6px;
+  text-align: center;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.api-status-mobile.error {
+  background: rgba(255, 0, 0, 0.2);
+  color: #ff6b6b;
+  border: 1px solid rgba(255, 0, 0, 0.3);
+}
+
+.api-status-mobile.loading {
+  background: rgba(255, 193, 7, 0.2);
+  color: #ffc107;
+  border: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+.api-status-mobile.offline {
+  background: rgba(108, 117, 125, 0.2);
+  color: #6c757d;
+  border: 1px solid rgba(108, 117, 125, 0.3);
 }
 </style> 
